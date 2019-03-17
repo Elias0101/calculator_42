@@ -6,7 +6,7 @@
 /*   By: tkarri <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/16 12:56:10 by tkarri            #+#    #+#             */
-/*   Updated: 2019/03/17 16:36:41 by tkarri           ###   ########.fr       */
+/*   Updated: 2019/03/17 17:38:49 by tkarri           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # include <unistd.h>
 
 # include <stdlib.h>
+
+#include <stdio.h> //DELET EME
 
 typedef struct		s_btree
 {

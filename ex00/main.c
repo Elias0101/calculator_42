@@ -6,7 +6,7 @@
 /*   By: tkarri <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/16 12:04:35 by tkarri            #+#    #+#             */
-/*   Updated: 2019/03/17 16:00:25 by tkarri           ###   ########.fr       */
+/*   Updated: 2019/03/17 17:42:30 by tkarri           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ t_btree		*create_knots(char sign, t_btree *curr, int i)
 		new = create_knot(NULL, sign);
 	new->left = create_knot(get_part_before(curr->item, i), ' ');
 	new->right = create_knot(get_part_after(curr->item, i), ' ');
+	printf("\nknots: sign |%c|%s| , left: |%c|%s| , right: |%c|%s|\n", new->sign, new->item, (new->left)->sign, (new->left)->item, (new->right)->sign, (new->right)->item);
 	return (new);
 }
 
@@ -69,14 +70,14 @@ void		create_tree(t_btree *current, int i)
 	}
 }
 
-int			eval_expr(char *input)
+int			eval_expr(char *str)
 {
 	t_btree		*root;
-	char		*str;
+	char		*input;
 
-	str = remove_spaces(input);
-	delete_external_scopes(str);
-	root = create_root(str);
+	input = remove_spaces(str);
+	delete_external_scopes(input);
+	root = create_root(input);
 	create_tree(root, -1);
 	return (calculate_tree(root));
 }
