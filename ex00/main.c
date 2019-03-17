@@ -6,71 +6,82 @@
 /*   By: tkarri <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/16 12:04:35 by tkarri            #+#    #+#             */
-/*   Updated: 2019/03/16 18:25:06 by tkarri           ###   ########.fr       */
+/*   Updated: 2019/03/17 16:00:25 by tkarri           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "header.h"
 
-int		need_size(char *input)
+t_btree		*create_knot(void *data, char sign)
 {
-	int i;
-	int count;
+	t_btree *new;
 
-	i = 0;
-	count = 0;
-	while (input[i] != '\0')
+	new = malloc(sizeof(t_btree));
+	if (new)
 	{
-		if (input[i] !='\n' &&input[i] != '\r' && input[i] !='\v'
-			&& input[i] != '\f' && input[i] != '\t' && input[i] != ' ')
-			count++;
-		i++;
-	}
-	return (count);
-}
-
-char	*remove_spaces(char *input)
-{
-	int i;
-	int j;
-	char *str;
-
-	i = 0;
-	j = 0; //Checking ".....(12+3-4+5).." --> remove such scope
-	str = malloc(need_size(input) + 1);
-	while (input[i] != '\0')
-	{
-		if (input[i] != '\n' && input[i] != '\r' && input[i] != '\v'
-			&& input[i] != '\f' && input[i] != '\t' && input[i] != ' ')
+		new->left = NULL;
+		new->right = NULL;
+		new->sign = sign;
+		if (data != NULL)
 		{
-			str[j] = input[i];
-			j++;
+			new->item = (char*)malloc(sizeof(data));
+			new->item = data;
 		}
-		i++;
+		else
+			new->item = NULL;
 	}
-	str[j] = '\0';
-	return (str);
+	return (new);
 }
 
-int		eval_expr(char *input)
+t_btree		*create_knots(char sign, t_btree *curr, int i)
 {
-	t_btree *root;
-	char *str;
+	t_btree *new;
+
+	if (sign == '-')
+		new = create_knot("-", '+');
+	else
+		new = create_knot(NULL, sign);
+	new->left = create_knot(get_part_before(curr->item, i), ' ');
+	new->right = create_knot(get_part_after(curr->item, i), ' ');
+	return (new);
+}
+
+void		create_tree(t_btree *current, int i)
+{
+	if (current != NULL)
+	{
+		delete_external_scopes(current->item);
+		if ((i = split_oper('+', current->item)) != -1)
+			*current = *create_knots('+', current, i);
+		else if ((i = split_minus(current->item)) != -1)
+			*current = *create_knots('-', current, i);
+		else if ((i = split_oper('*', current->item)) != -1)
+			*current = *create_knots('*', current, i);
+		else if ((i = split_oper('/', current->item)) != -1)
+			*current = *create_knots('/', current, i);
+		else if ((i = split_oper('%', current->item)) != -1)
+			*current = *create_knots('%', current, i);
+		if (i != -1)
+		{
+			create_tree(current->left, -1);
+			create_tree(current->right, -1);
+		}
+	}
+}
+
+int			eval_expr(char *input)
+{
+	t_btree		*root;
+	char		*str;
 
 	str = remove_spaces(input);
-	printf("%s-\n\n", str);
+	delete_external_scopes(str);
 	root = create_root(str);
 	create_tree(root, -1);
-	printf("%c\n", root->sign);
-	printf("%s\n", (root->left)->item);
-	printf("%c\n", (root->right)->sign);
-	printf("%s\n", ((root->right)->right)->item);
-	printf("%c\n", ((root->right)->right)->sign);
-	printf("%s\n", ((root->right)->right)->item);
-	return (0); //DELETE
+	return (calculate_tree(root));
 }
 
-int		main(int ac, char **av)
+int			main(int ac, char **av)
 {
 	if (ac > 1)
 	{
